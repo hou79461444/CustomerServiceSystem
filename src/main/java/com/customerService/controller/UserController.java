@@ -6,6 +6,7 @@ import com.customerService.service.UserService;
 import com.customerService.util.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -24,10 +25,14 @@ public class UserController {
     @PostMapping("/save")
     public Result saveUserInfo(@RequestBody UserInfoReq userInfoReq) {
 
-        // 接收请求参数，封装到实体类
+        // 接收请求参数，客服人员信息
         UserInfoSum userInfoSum = new UserInfoSum();
         userInfoSum.setUsername(userInfoReq.getUsername());
-        userInfoSum.setPassword(userInfoReq.getPassword());
+        // 密码进行MD5盐值加密
+        String password = userInfoReq.getPassword();
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encode = passwordEncoder.encode(password);
+        userInfoSum.setPassword(encode);
         userInfoSum.setCompany(userInfoReq.getCompany());
         userInfoSum.setNickname(userInfoReq.getNickname());
         userInfoSum.setCreateTime(LocalDateTime.now());
