@@ -1,6 +1,7 @@
 package com.customerService.service.impl;
 
 import com.customerService.domain.UserInfo;
+import com.customerService.domain.UserInfoDisplay;
 import com.customerService.domain.UserInfoExpand;
 import com.customerService.domain.UserInfoSum;
 import com.customerService.mapper.UserMapper;
@@ -9,6 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +26,7 @@ public class UserServiceImpl implements UserService {
 
     // 添加客服信息表和客服信息扩展表相关信息
     @Override
-    public Boolean saveUserInfo(UserInfoSum userInfoSum) {
+    public boolean saveUserInfo(UserInfoSum userInfoSum) {
 
         // 添加客服信息表相关信息
         UserInfo userInfo = new UserInfo();
@@ -31,6 +35,7 @@ public class UserServiceImpl implements UserService {
         userInfo.setCompany(userInfoSum.getCompany());
         userInfo.setNickname(userInfoSum.getNickname());
         userInfo.setCreateTime(userInfoSum.getCreateTime());
+        userInfo.setUpdateTime(userInfoSum.getUpdateTime());
         userInfo.setDeleted(0);
         int saveCount1 = userMapper.saveUserInfo(userInfo);
 
@@ -68,7 +73,7 @@ public class UserServiceImpl implements UserService {
 
     // 删除客服信息表（根据客服信息表id，逻辑删除）
     @Override
-    public Boolean removeById(Integer userInfoId) {
+    public boolean removeById(Integer userInfoId) {
 
         // 判断该客服信息数据是否已经逻辑删除
         int ifExists = userMapper.getIfExists(userInfoId);
@@ -91,7 +96,7 @@ public class UserServiceImpl implements UserService {
 
     // 修改客服信息表和客服信息扩展表相关信息
     @Override
-    public Boolean updateUserInfo(UserInfoSum userInfoSum) {
+    public boolean updateUserInfo(UserInfoSum userInfoSum) {
 
         // 获取用户信息id
         int userInfoId = userInfoSum.getId();
@@ -147,7 +152,7 @@ public class UserServiceImpl implements UserService {
 
     // 查询客服信息表和客服信息扩展表中单个用户信息（根据客服信息表id）
     @Override
-    public UserInfoSum getUserInfoById(Integer userInfoId) {
+    public UserInfoDisplay getUserInfoById(Integer userInfoId) {
 
         // 判断该客服信息数据是否已经逻辑删除
         int ifExists = userMapper.getIfExists(userInfoId);
@@ -159,20 +164,22 @@ public class UserServiceImpl implements UserService {
             UserInfo userInfo = userMapper.getUserInfoById(userInfoId);
             UserInfoExpand userInfoExpand = userMapper.getUserInfoExpandById(userInfoId);
 
-            UserInfoSum userInfoSum = new UserInfoSum();
-            userInfoSum.setId(userInfoId);
-            userInfoSum.setUsername(userInfo.getUsername());
-            userInfoSum.setPassword(userInfo.getPassword());
-            userInfoSum.setCompany(userInfo.getCompany());
-            userInfoSum.setNickname(userInfo.getNickname());
-            userInfoSum.setCreateTime(userInfo.getCreateTime());
-            userInfoSum.setUpdateTime(userInfo.getUpdateTime());
-            userInfoSum.setExternalNickname(userInfoExpand.getExternalNickname());
-            userInfoSum.setEmail(userInfoExpand.getEmail());
-            userInfoSum.setPhone(userInfoExpand.getPhone());
-            userInfoSum.setCountry(userInfoExpand.getCountry());
-            userInfoSum.setDefaultLanguage(userInfoExpand.getDefaultLanguage());
-            return userInfoSum;
+            UserInfoDisplay userInfoDisplay = new UserInfoDisplay();
+            userInfoDisplay.setId(userInfoId);
+            userInfoDisplay.setUsername(userInfo.getUsername());
+            userInfoDisplay.setPassword(userInfo.getPassword());
+            userInfoDisplay.setCompany(userInfo.getCompany());
+            userInfoDisplay.setNickname(userInfo.getNickname());
+            // 日期显示格式
+            DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            userInfoDisplay.setCreateTime(userInfo.getCreateTime().format(pattern));
+            userInfoDisplay.setUpdateTime(userInfo.getUpdateTime().format(pattern));
+            userInfoDisplay.setExternalNickname(userInfoExpand.getExternalNickname());
+            userInfoDisplay.setEmail(userInfoExpand.getEmail());
+            userInfoDisplay.setPhone(userInfoExpand.getPhone());
+            userInfoDisplay.setCountry(userInfoExpand.getCountry());
+            userInfoDisplay.setDefaultLanguage(userInfoExpand.getDefaultLanguage());
+            return userInfoDisplay;
         } else {
             log.info("该客服信息已经逻辑删除，不可查询");
             return null;
@@ -181,35 +188,47 @@ public class UserServiceImpl implements UserService {
 
     // 查询客服信息表和客服信息扩展表中所有用户信息
     @Override
-    public List<UserInfoSum> getUserInfoAll() {
+    public List<UserInfoDisplay> getUserInfoAll() {
 
         // 查询客服信息表中所有用户信息
         List<UserInfo> userInfos = userMapper.getUserInfoAll();
 
         // 遍历该集合，查询客服信息扩展表相关数据，将二者合并封装
-        List<UserInfoSum> userInfoSums = new ArrayList<>();
+        List<UserInfoDisplay> userInfoDisplays = new ArrayList<>();
 
         for (UserInfo userInfo : userInfos) {
             Integer userInfoId = userInfo.getId();
             UserInfoExpand userInfoExpand = userMapper.getUserInfoExpandById(userInfoId);
 
-            UserInfoSum userInfoSum = new UserInfoSum();
-            userInfoSum.setId(userInfoId);
-            userInfoSum.setUsername(userInfo.getUsername());
-            userInfoSum.setPassword(userInfo.getPassword());
-            userInfoSum.setCompany(userInfo.getCompany());
-            userInfoSum.setNickname(userInfo.getNickname());
-            userInfoSum.setCreateTime(userInfo.getCreateTime());
-            userInfoSum.setUpdateTime(userInfo.getUpdateTime());
-            userInfoSum.setExternalNickname(userInfoExpand.getExternalNickname());
-            userInfoSum.setEmail(userInfoExpand.getEmail());
-            userInfoSum.setPhone(userInfoExpand.getPhone());
-            userInfoSum.setCountry(userInfoExpand.getCountry());
-            userInfoSum.setDefaultLanguage(userInfoExpand.getDefaultLanguage());
+            UserInfoDisplay userInfoDisplay = new UserInfoDisplay();
+            userInfoDisplay.setId(userInfoId);
+            userInfoDisplay.setUsername(userInfo.getUsername());
+            userInfoDisplay.setPassword(userInfo.getPassword());
+            userInfoDisplay.setCompany(userInfo.getCompany());
+            userInfoDisplay.setNickname(userInfo.getNickname());
+            // 日期显示格式
+            DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            userInfoDisplay.setCreateTime(userInfo.getCreateTime().format(pattern));
+            userInfoDisplay.setUpdateTime(userInfo.getUpdateTime().format(pattern));
+            userInfoDisplay.setExternalNickname(userInfoExpand.getExternalNickname());
+            userInfoDisplay.setEmail(userInfoExpand.getEmail());
+            userInfoDisplay.setPhone(userInfoExpand.getPhone());
+            userInfoDisplay.setCountry(userInfoExpand.getCountry());
+            userInfoDisplay.setDefaultLanguage(userInfoExpand.getDefaultLanguage());
 
-            userInfoSums.add(userInfoSum);
+            userInfoDisplays.add(userInfoDisplay);
         }
 
-        return userInfoSums;
+        return userInfoDisplays;
+    }
+
+    // 查询客服信息表中单个用户信息（根据客服信息表的登录账号）
+    @Override
+    public boolean getUserInfoByUsername(String username) {
+        UserInfo userInfo = userMapper.getUserInfoByUsername(username);
+        if (userInfo == null) {
+            return false;
+        }
+        return true;
     }
 }

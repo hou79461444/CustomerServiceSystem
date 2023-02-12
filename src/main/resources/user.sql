@@ -10,8 +10,8 @@ create table `tbl_user_info` (
 	`company` varchar(64) not null comment '所属公司',
 	`nickname` varchar(64) not null comment '昵称',
 	`create_time` datetime not null comment '创建时间',
-	`update_time` datetime comment '更新时间',
-	`deleted` int(1) comment '逻辑删除标记',
+	`update_time` datetime not null comment '更新时间',
+	`deleted` int(1) not null comment '逻辑删除标记',
 	primary key (`id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

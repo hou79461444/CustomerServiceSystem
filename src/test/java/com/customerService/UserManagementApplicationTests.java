@@ -1,5 +1,6 @@
 package com.customerService;
 
+import com.customerService.domain.UserInfoDisplay;
 import com.customerService.domain.UserInfoSum;
 import com.customerService.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -56,13 +57,19 @@ class UserManagementApplicationTests {
     @Test
     void testGetById() {
         Integer userInfoId = 2;
-        UserInfoSum userInfoSum = userService.getUserInfoById(userInfoId);
-        System.out.println(userInfoSum);
+        UserInfoDisplay userInfoById = userService.getUserInfoById(userInfoId);
+        System.out.println(userInfoById);
     }
 
     @Test
     void testGetAll() {
-        List<UserInfoSum> userInfoSums = userService.getUserInfoAll();
-        System.out.println(userInfoSums);
+        List<UserInfoDisplay> userInfoAll = userService.getUserInfoAll();
+        System.out.println(userInfoAll);
+    }
+
+    @Test
+    void test() {
+        boolean flag = userService.getUserInfoByUsername("79461444li");
+        System.out.println(flag);
     }
 }

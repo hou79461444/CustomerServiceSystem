@@ -1,5 +1,6 @@
 package com.customerService.controller;
 
+import com.customerService.domain.UserInfoDisplay;
 import com.customerService.domain.UserInfoSum;
 import com.customerService.domain.request.UserInfoReq;
 import com.customerService.service.UserService;
@@ -29,21 +30,28 @@ public class UserController {
         UserInfoSum userInfoSum = new UserInfoSum();
         userInfoSum.setUsername(userInfoReq.getUsername());
         // 密码进行MD5盐值加密
-        String password = userInfoReq.getPassword();
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        String encode = passwordEncoder.encode(password);
-        userInfoSum.setPassword(encode);
+        String password = passwordEncoder.encode(userInfoReq.getPassword());
+        userInfoSum.setPassword(password);
         userInfoSum.setCompany(userInfoReq.getCompany());
         userInfoSum.setNickname(userInfoReq.getNickname());
         userInfoSum.setCreateTime(LocalDateTime.now());
+        userInfoSum.setUpdateTime(LocalDateTime.now());
         userInfoSum.setExternalNickname(userInfoReq.getExternalNickname());
         userInfoSum.setEmail(userInfoReq.getEmail());
         userInfoSum.setPhone(userInfoReq.getPhone());
         userInfoSum.setCountry(userInfoReq.getCountry());
         userInfoSum.setDefaultLanguage(userInfoReq.getDefaultLanguage());
 
+        // 判断数据库中该用户是否存在
+        boolean isExists = userService.getUserInfoByUsername(userInfoReq.getUsername());
+        if (isExists) {
+            log.error("该用户已存在，客服信息添加失败");
+            return new Result(HttpStatus.NOT_FOUND.value(), "该用户已存在，客服信息添加失败");
+        }
+
         // 调用业务层方法
-        Boolean flag = userService.saveUserInfo(userInfoSum);
+        boolean flag = userService.saveUserInfo(userInfoSum);
 
         if (flag) {
             log.info("客服信息添加成功");
@@ -56,7 +64,7 @@ public class UserController {
 
     @DeleteMapping("/delete/{id}")
     public Result removeUserInfo(@PathVariable Integer id) {
-        Boolean flag = userService.removeById(id);
+        boolean flag = userService.removeById(id);
         if (flag) {
             log.info("客服信息删除成功");
             return new Result(HttpStatus.OK.value(), "客服信息删除成功");
@@ -84,7 +92,7 @@ public class UserController {
         userInfoSum.setDefaultLanguage(userInfoReq.getDefaultLanguage());
 
         // 调用业务层方法
-        Boolean flag = userService.updateUserInfo(userInfoSum);
+        boolean flag = userService.updateUserInfo(userInfoSum);
 
         if (flag) {
             log.info("客服信息修改成功");
@@ -97,10 +105,10 @@ public class UserController {
 
     @GetMapping("/get/{id}")
     public Result getUserInfoById(@PathVariable Integer id) {
-        UserInfoSum userInfo = userService.getUserInfoById(id);
-        if (userInfo != null) {
+        UserInfoDisplay userInfoDisplay = userService.getUserInfoById(id);
+        if (userInfoDisplay != null) {
             log.info("客服信息查询成功");
-            return new Result(HttpStatus.OK.value(), "客服信息查询成功", userInfo);
+            return new Result(HttpStatus.OK.value(), "客服信息查询成功", userInfoDisplay);
         } else {
             log.info("客服信息查询失败");
             return new Result(HttpStatus.NOT_FOUND.value(), "客服信息查询失败");
@@ -109,10 +117,10 @@ public class UserController {
 
     @GetMapping("/get")
     public Result getUserInfoAll() {
-        List<UserInfoSum> userInfoSums = userService.getUserInfoAll();
-        if (userInfoSums != null) {
+        List<UserInfoDisplay> userInfoDisplays = userService.getUserInfoAll();
+        if (userInfoDisplays != null) {
             log.info("客服信息查询成功");
-            return new Result(HttpStatus.OK.value(), "客服信息查询成功", userInfoSums);
+            return new Result(HttpStatus.OK.value(), "客服信息查询成功", userInfoDisplays);
         } else {
             log.info("客服信息查询失败");
             return new Result(HttpStatus.NOT_FOUND.value(), "客服信息查询失败");

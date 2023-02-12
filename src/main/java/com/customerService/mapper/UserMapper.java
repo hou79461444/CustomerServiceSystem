@@ -11,7 +11,7 @@ import java.util.List;
 public interface UserMapper {
 
     // 添加客服信息表相关信息
-    @Insert("insert into tbl_user_info values(null, #{username}, #{password}, #{company}, #{nickname}, #{createTime}, null, #{deleted})")
+    @Insert("insert into tbl_user_info values(null, #{username}, #{password}, #{company}, #{nickname}, #{createTime}, #{updateTime}, #{deleted})")
     int saveUserInfo(UserInfo userInfo);
 
     // 添加客服信息扩展表相关信息
@@ -60,4 +60,12 @@ public interface UserMapper {
     // 判断客服信息表是否已经逻辑删除（根据客服信息表id，判断deleted是否为0）
     @Select("select deleted from tbl_user_info where id=#{userInfoId}")
     int getIfExists(Integer userInfoId);
+
+    // 查询客服信息表中单个用户信息（根据客服信息表的登录账号）
+    @Select("select * from tbl_user_info where username=#{username}")
+    @Results({
+            @Result(property = "createTime", column = "create_time"),
+            @Result(property = "updateTime", column = "update_time")
+    })
+    UserInfo getUserInfoByUsername(String username);
 }
