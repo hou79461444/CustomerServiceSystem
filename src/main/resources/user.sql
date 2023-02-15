@@ -4,7 +4,7 @@ use `hzx`;
 -- /客服信息表
 drop table if exists `tbl_user_info`;
 create table `tbl_user_info` (
-	`id` int(11) unsigned not null auto_increment comment '主键id',
+	`id` bigint unsigned not null auto_increment comment '主键id',
 	`username` varchar(64) not null comment '登录账号',
   `password` varchar(64) not null comment '密码',
 	`company` varchar(64) not null comment '所属公司',
@@ -18,7 +18,7 @@ create table `tbl_user_info` (
 -- /客服信息扩展表
 drop table if exists `tbl_user_info_expand`;
 create table `tbl_user_info_expand` (
-	`id` int(11) unsigned not null auto_increment comment '主键id',
+	`id` bigint unsigned not null auto_increment comment '主键id',
 	`info_id` int(11) unsigned not null comment '客服信息表id', 
 	`external_nickname` varchar(64) not null comment '对外显示昵称',
   `email` varchar(64) not null comment '邮箱',

@@ -36,7 +36,7 @@ class UserManagementApplicationTests {
 
     @Test
     void testRemove() {
-        Integer userInfoId = 2;
+        Long userInfoId = 2L;
         Boolean flag = userService.removeById(userInfoId);
         System.out.println(flag);
     }
@@ -44,7 +44,7 @@ class UserManagementApplicationTests {
     @Test
     void testUpdate() {
         UserInfoSum userInfoSum = new UserInfoSum();
-        userInfoSum.setId(3);
+        userInfoSum.setId(3L);
         userInfoSum.setNickname("猛男");
         userInfoSum.setUpdateTime(LocalDateTime.now());
         userInfoSum.setCountry("法国");
@@ -56,7 +56,7 @@ class UserManagementApplicationTests {
 
     @Test
     void testGetById() {
-        Integer userInfoId = 2;
+        Long userInfoId = 2L;
         UserInfoDisplay userInfoById = userService.getUserInfoById(userInfoId);
         System.out.println(userInfoById);
     }

@@ -10,9 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,14 +39,14 @@ public class UserServiceImpl implements UserService {
 
         // 判断添加客服信息表相关信息是否成功
         if (saveCount1 == 0) {
-            log.info("客服信息表数据添加失败");
+            log.error("客服信息表数据添加失败");
             return false;
         } else {
             log.info("客服信息表数据添加成功");
         }
 
         // 查询刚添加的客服信息主键id
-        Integer userInfoId = userMapper.getUserInfoIdByUsername(userInfoSum.getUsername());
+        Long userInfoId = userMapper.getUserInfoIdByUsername(userInfoSum.getUsername());
 
         // 添加客服信息扩展表相关信息
         UserInfoExpand userInfoExpand = new UserInfoExpand();
@@ -62,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
         // 判断添加客服信息扩展表相关信息是否成功
         if (saveCount2 == 0) {
-            log.info("客服信息扩展表数据添加失败");
+            log.error("客服信息扩展表数据添加失败");
             return false;
         } else {
             log.info("客服信息扩展表数据添加成功");
@@ -73,7 +71,7 @@ public class UserServiceImpl implements UserService {
 
     // 删除客服信息表（根据客服信息表id，逻辑删除）
     @Override
-    public boolean removeById(Integer userInfoId) {
+    public boolean removeById(Long userInfoId) {
 
         // 判断该客服信息数据是否已经逻辑删除
         int ifExists = userMapper.getIfExists(userInfoId);
@@ -82,11 +80,11 @@ public class UserServiceImpl implements UserService {
             log.info("该客服信息存在，可逻辑删除");
             int removeCount = userMapper.removeById(userInfoId);
             if (removeCount == 0) {
-                log.info("客服信息表数据删除失败");
+                log.error("客服信息表数据删除失败");
                 return false;
             }
         } else {
-            log.info("该客服信息不存在，不可逻辑删除");
+            log.error("该客服信息不存在，不可逻辑删除");
             return false;
         }
 
@@ -99,7 +97,7 @@ public class UserServiceImpl implements UserService {
     public boolean updateUserInfo(UserInfoSum userInfoSum) {
 
         // 获取用户信息id
-        int userInfoId = userInfoSum.getId();
+        long userInfoId = userInfoSum.getId();
 
         // 判断该客服信息数据是否已经逻辑删除
         int ifExists = userMapper.getIfExists(userInfoId);
@@ -119,7 +117,7 @@ public class UserServiceImpl implements UserService {
 
             // 判断客服信息表相关信息是否修改成功
             if (updateCount1 == 0) {
-                log.info("客服信息表数据修改失败");
+                log.error("客服信息表数据修改失败");
                 return false;
             } else {
                 log.info("客服信息表数据修改成功");
@@ -137,7 +135,7 @@ public class UserServiceImpl implements UserService {
 
             // 判断客服信息扩展表相关信息是否修改成功
             if (updateCount2 == 0) {
-                log.info("客服信息扩展表数据修改失败");
+                log.error("客服信息扩展表数据修改失败");
                 return false;
             } else {
                 log.info("客服信息扩展表数据修改成功");
@@ -145,14 +143,14 @@ public class UserServiceImpl implements UserService {
 
             return true;
         } else {
-            log.info("该客服信息已经逻辑删除，不可修改");
+            log.error("该客服信息已经逻辑删除，不可修改");
             return false;
         }
     }
 
     // 查询客服信息表和客服信息扩展表中单个用户信息（根据客服信息表id）
     @Override
-    public UserInfoDisplay getUserInfoById(Integer userInfoId) {
+    public UserInfoDisplay getUserInfoById(Long userInfoId) {
 
         // 判断该客服信息数据是否已经逻辑删除
         int ifExists = userMapper.getIfExists(userInfoId);
@@ -181,7 +179,7 @@ public class UserServiceImpl implements UserService {
             userInfoDisplay.setDefaultLanguage(userInfoExpand.getDefaultLanguage());
             return userInfoDisplay;
         } else {
-            log.info("该客服信息已经逻辑删除，不可查询");
+            log.error("该客服信息已经逻辑删除，不可查询");
             return null;
         }
     }
@@ -197,7 +195,7 @@ public class UserServiceImpl implements UserService {
         List<UserInfoDisplay> userInfoDisplays = new ArrayList<>();
 
         for (UserInfo userInfo : userInfos) {
-            Integer userInfoId = userInfo.getId();
+            Long userInfoId = userInfo.getId();
             UserInfoExpand userInfoExpand = userMapper.getUserInfoExpandById(userInfoId);
 
             UserInfoDisplay userInfoDisplay = new UserInfoDisplay();

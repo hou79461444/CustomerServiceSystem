@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class UserInfoSum {
-    private Integer id;                 // 主键
+    private Long id;                    // 主键
     private String username;            // 登录账号
     private String password;            // 密码
     private String company;             // 所属公司

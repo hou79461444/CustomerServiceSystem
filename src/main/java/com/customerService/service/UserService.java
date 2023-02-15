@@ -12,13 +12,13 @@ public interface UserService {
     boolean saveUserInfo(UserInfoSum userInfoSum);
 
     // 删除客服信息表（根据客服信息表id，逻辑删除）
-    boolean removeById(Integer userInfoId);
+    boolean removeById(Long userInfoId);
 
     // 修改客服信息表和客服信息扩展表相关信息
     boolean updateUserInfo(UserInfoSum userInfoSum);
 
     // 查询客服信息表和客服信息扩展表中单个用户信息（根据客服信息表id）
-    UserInfoDisplay getUserInfoById(Integer userInfoId);
+    UserInfoDisplay getUserInfoById(Long userInfoId);
 
     // 查询客服信息表和客服信息扩展表中所有用户信息
     List<UserInfoDisplay> getUserInfoAll();

@@ -20,7 +20,7 @@ public interface UserMapper {
 
     // 删除客服信息表（根据客服信息表id，逻辑删除）
     @Delete("update tbl_user_info set deleted=1 where id=#{userInfoId}")
-    int removeById(Integer userInfoId);
+    int removeById(Long userInfoId);
 
     // 修改客服信息表相关信息
     int updateUserInfo(UserInfo userInfo);
@@ -34,7 +34,7 @@ public interface UserMapper {
             @Result(property = "createTime", column = "create_time"),
             @Result(property = "updateTime", column = "update_time")
     })
-    UserInfo getUserInfoById(Integer userInfoId);
+    UserInfo getUserInfoById(Long userInfoId);
 
     // 查询客服信息表中所有用户信息
     @Select("select * from tbl_user_info where deleted=0")
@@ -51,15 +51,15 @@ public interface UserMapper {
             @Result(property = "externalNickname", column = "external_nickname"),
             @Result(property = "defaultLanguage", column = "default_language")
     })
-    UserInfoExpand getUserInfoExpandById(Integer userInfoId);
+    UserInfoExpand getUserInfoExpandById(Long userInfoId);
 
     // 查询客服信息表主键id（根据登录账号username查询）
     @Select("select id from tbl_user_info where username=#{username}")
-    int getUserInfoIdByUsername(String username);
+    long getUserInfoIdByUsername(String username);
 
     // 判断客服信息表是否已经逻辑删除（根据客服信息表id，判断deleted是否为0）
     @Select("select deleted from tbl_user_info where id=#{userInfoId}")
-    int getIfExists(Integer userInfoId);
+    int getIfExists(Long userInfoId);
 
     // 查询客服信息表中单个用户信息（根据客服信息表的登录账号）
     @Select("select * from tbl_user_info where username=#{username}")
