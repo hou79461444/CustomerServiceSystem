@@ -1,7 +1,7 @@
 package com.customerService.service;
 
 import com.customerService.domain.UserInfoDisplay;
-import com.customerService.domain.UserInfoSum;
+import com.customerService.domain.request.UserInfoReq;
 
 import java.util.List;
 
@@ -9,13 +9,13 @@ import java.util.List;
 public interface UserService {
 
     // 添加客服信息表和客服信息扩展表相关信息
-    boolean saveUserInfo(UserInfoSum userInfoSum);
+    boolean saveUserInfo(UserInfoReq userInfoReq);
 
     // 删除客服信息表（根据客服信息表id，逻辑删除）
     boolean removeById(Long userInfoId);
 
     // 修改客服信息表和客服信息扩展表相关信息
-    boolean updateUserInfo(UserInfoSum userInfoSum);
+    boolean updateUserInfo(UserInfoReq userInfoReq);
 
     // 查询客服信息表和客服信息扩展表中单个用户信息（根据客服信息表id）
     UserInfoDisplay getUserInfoById(Long userInfoId);

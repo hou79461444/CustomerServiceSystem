@@ -3,13 +3,15 @@ package com.customerService.service.impl;
 import com.customerService.domain.UserInfo;
 import com.customerService.domain.UserInfoDisplay;
 import com.customerService.domain.UserInfoExpand;
-import com.customerService.domain.UserInfoSum;
+import com.customerService.domain.request.UserInfoReq;
 import com.customerService.mapper.UserMapper;
 import com.customerService.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,16 +26,27 @@ public class UserServiceImpl implements UserService {
 
     // 添加客服信息表和客服信息扩展表相关信息
     @Override
-    public boolean saveUserInfo(UserInfoSum userInfoSum) {
+    public boolean saveUserInfo(UserInfoReq userInfoReq) {
+
+        // 判断数据库中该用户是否存在
+        boolean flag = getUserInfoByUsername(userInfoReq.getUsername());
+        if (flag) {
+            log.error("该用户账号已存在，不可添加");
+            return false;
+        } else {
+            log.info("该用户账号不存在，可以添加");
+        }
 
         // 添加客服信息表相关信息
         UserInfo userInfo = new UserInfo();
-        userInfo.setUsername(userInfoSum.getUsername());
-        userInfo.setPassword(userInfoSum.getPassword());
-        userInfo.setCompany(userInfoSum.getCompany());
-        userInfo.setNickname(userInfoSum.getNickname());
-        userInfo.setCreateTime(userInfoSum.getCreateTime());
-        userInfo.setUpdateTime(userInfoSum.getUpdateTime());
+        userInfo.setUsername(userInfoReq.getUsername());
+        // 密码进行MD5盐值加密
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        userInfo.setPassword(passwordEncoder.encode(userInfoReq.getPassword()));
+        userInfo.setCompany(userInfoReq.getCompany());
+        userInfo.setNickname(userInfoReq.getNickname());
+        userInfo.setCreateTime(LocalDateTime.now());
+        userInfo.setUpdateTime(LocalDateTime.now());
         userInfo.setDeleted(0);
         int saveCount1 = userMapper.saveUserInfo(userInfo);
 
@@ -45,17 +58,16 @@ public class UserServiceImpl implements UserService {
             log.info("客服信息表数据添加成功");
         }
 
-        // 查询刚添加的客服信息主键id
-        Long userInfoId = userMapper.getUserInfoIdByUsername(userInfoSum.getUsername());
-
         // 添加客服信息扩展表相关信息
         UserInfoExpand userInfoExpand = new UserInfoExpand();
+        // 查询刚添加的客服信息表id
+        Long userInfoId = userMapper.getUserInfoIdByUsername(userInfoReq.getUsername());
         userInfoExpand.setInfoId(userInfoId);
-        userInfoExpand.setExternalNickname(userInfoSum.getExternalNickname());
-        userInfoExpand.setEmail(userInfoSum.getEmail());
-        userInfoExpand.setPhone(userInfoSum.getPhone());
-        userInfoExpand.setCountry(userInfoSum.getCountry());
-        userInfoExpand.setDefaultLanguage(userInfoSum.getDefaultLanguage());
+        userInfoExpand.setExternalNickname(userInfoReq.getExternalNickname());
+        userInfoExpand.setEmail(userInfoReq.getEmail());
+        userInfoExpand.setPhone(userInfoReq.getPhone());
+        userInfoExpand.setCountry(userInfoReq.getCountry());
+        userInfoExpand.setDefaultLanguage(userInfoReq.getDefaultLanguage());
         int saveCount2 = userMapper.saveUserInfoExpand(userInfoExpand);
 
         // 判断添加客服信息扩展表相关信息是否成功
@@ -94,58 +106,58 @@ public class UserServiceImpl implements UserService {
 
     // 修改客服信息表和客服信息扩展表相关信息
     @Override
-    public boolean updateUserInfo(UserInfoSum userInfoSum) {
+    public boolean updateUserInfo(UserInfoReq userInfoReq) {
 
-        // 获取用户信息id
-        long userInfoId = userInfoSum.getId();
-
-        // 判断该客服信息数据是否已经逻辑删除
-        int ifExists = userMapper.getIfExists(userInfoId);
-
-        if (ifExists == 0) {
-            log.info("该客服信息存在，可修改");
-
-            // 修改客服信息表相关信息
-            UserInfo userInfo = new UserInfo();
-            userInfo.setId(userInfoId);
-            userInfo.setUsername(userInfoSum.getUsername());
-            userInfo.setPassword(userInfoSum.getPassword());
-            userInfo.setCompany(userInfoSum.getCompany());
-            userInfo.setNickname(userInfoSum.getNickname());
-            userInfo.setUpdateTime(userInfoSum.getUpdateTime());
-            int updateCount1 = userMapper.updateUserInfo(userInfo);
-
-            // 判断客服信息表相关信息是否修改成功
-            if (updateCount1 == 0) {
-                log.error("客服信息表数据修改失败");
-                return false;
-            } else {
-                log.info("客服信息表数据修改成功");
-            }
-
-            // 修改客服信息扩展表相关信息
-            UserInfoExpand userInfoExpand = new UserInfoExpand();
-            userInfoExpand.setInfoId(userInfoId);
-            userInfoExpand.setExternalNickname(userInfoSum.getExternalNickname());
-            userInfoExpand.setEmail(userInfoSum.getEmail());
-            userInfoExpand.setPhone(userInfoSum.getPhone());
-            userInfoExpand.setCountry(userInfoSum.getCountry());
-            userInfoExpand.setDefaultLanguage(userInfoSum.getDefaultLanguage());
-            int updateCount2 = userMapper.updateUserInfoExpand(userInfoExpand);
-
-            // 判断客服信息扩展表相关信息是否修改成功
-            if (updateCount2 == 0) {
-                log.error("客服信息扩展表数据修改失败");
-                return false;
-            } else {
-                log.info("客服信息扩展表数据修改成功");
-            }
-
-            return true;
-        } else {
-            log.error("该客服信息已经逻辑删除，不可修改");
+        // 判断该客服人员信息是否已经被逻辑删除
+        int deleted = userMapper.getIfExists(userInfoReq.getId());
+        if (deleted == 1) {
+            log.error("该客服人员信息已经被逻辑删除，不可修改");
             return false;
+        } else {
+            log.info("该客服人员信息存在，可以修改");
         }
+
+        // 修改客服信息表相关信息
+        UserInfo userInfo = new UserInfo();
+        userInfo.setId(userInfoReq.getId());
+        userInfo.setUsername(userInfoReq.getUsername());
+        // 密码进行MD5盐值加密
+        if (userInfoReq.getPassword() != null) {
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            userInfo.setPassword(passwordEncoder.encode(userInfoReq.getPassword()));
+        }
+        userInfo.setCompany(userInfoReq.getCompany());
+        userInfo.setNickname(userInfoReq.getNickname());
+        userInfo.setUpdateTime(LocalDateTime.now());
+        int updateCount1 = userMapper.updateUserInfo(userInfo);
+
+        // 判断客服信息表相关信息是否修改成功
+        if (updateCount1 == 0) {
+            log.error("客服信息表数据修改失败");
+            return false;
+        } else {
+            log.info("客服信息表数据修改成功");
+        }
+
+        // 修改客服信息扩展表相关信息
+        UserInfoExpand userInfoExpand = new UserInfoExpand();
+        userInfoExpand.setInfoId(userInfoReq.getId());
+        userInfoExpand.setExternalNickname(userInfoReq.getExternalNickname());
+        userInfoExpand.setEmail(userInfoReq.getEmail());
+        userInfoExpand.setPhone(userInfoReq.getPhone());
+        userInfoExpand.setCountry(userInfoReq.getCountry());
+        userInfoExpand.setDefaultLanguage(userInfoReq.getDefaultLanguage());
+        int updateCount2 = userMapper.updateUserInfoExpand(userInfoExpand);
+
+        // 判断客服信息扩展表相关信息是否修改成功
+        if (updateCount2 == 0) {
+            log.error("客服信息扩展表数据修改失败");
+            return false;
+        } else {
+            log.info("客服信息扩展表数据修改成功");
+        }
+
+        return true;
     }
 
     // 查询客服信息表和客服信息扩展表中单个用户信息（根据客服信息表id）
