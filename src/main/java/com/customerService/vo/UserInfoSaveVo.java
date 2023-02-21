@@ -1,4 +1,4 @@
-package com.customerService.domain.request;
+package com.customerService.vo;
 
 import lombok.Data;
 
@@ -8,9 +8,7 @@ import javax.validation.constraints.Pattern;
 
 
 @Data
-public class UserInfoReq {
-
-    private Long id;                    // 用户id
+public class UserInfoSaveVo {
 
     @NotBlank(message = "登录账号不能为空")
     private String username;            // 登录账号
@@ -25,6 +23,9 @@ public class UserInfoReq {
 
     @NotBlank(message = "昵称不能为空")
     private String nickname;            // 昵称
+
+    @NotBlank(message = "身份证号不能为空")
+    private String idNumber;            // 身份证号
 
     @NotBlank(message = "对外显示昵称不能为空")
     private String externalNickname;    // 对外显示昵称

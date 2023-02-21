@@ -1,17 +1,19 @@
-package com.customerService.domain;
+package com.customerService.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import javax.validation.constraints.NotNull;
 
 
 @Data
-public class UserInfoDisplay {
-    private Long id;                    // 主键
+public class UserInfoGetVo {
+    @NotNull(message = "用户id不能为空")
+    private Long id;
     private String username;            // 登录账号
     private String password;            // 密码
     private String company;             // 所属公司
     private String nickname;            // 昵称
+    private String idNumber;            // 身份证号
     private String createTime;          // 创建时间
     private String updateTime;          // 更新时间
     private String externalNickname;    // 对外显示昵称

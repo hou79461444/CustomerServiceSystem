@@ -9,6 +9,7 @@ create table `tbl_user_info` (
   `password` varchar(64) not null comment '密码',
 	`company` varchar(64) not null comment '所属公司',
 	`nickname` varchar(64) not null comment '昵称',
+	`id_number` varchar(64) not null comment '身份证号',
 	`create_time` datetime not null comment '创建时间',
 	`update_time` datetime not null comment '更新时间',
 	`deleted` int(1) not null comment '逻辑删除标记',
